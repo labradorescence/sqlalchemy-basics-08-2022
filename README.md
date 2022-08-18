@@ -20,118 +20,104 @@
 
 ***
 
-## Defining Tables via SQLAlchemy ORM
+## The Session
 
-Creating tables with SQLAlchemy ORM requires classes with four key traits:
+SQLAlchemy interacts with the database through **sessions**. These wrap
+**engine** objects, which we create using a database address and SQLAlchemy's
+`create_engine` method. The session contains an **identity map**, which is
+similar to an empty dictionary with keys for the table name, columns, and
+primary keys. When the session pulls data from `bookstore.db`, it fills the
+identity map and uses it to populate a `Book` object with specific attribute
+values. When it commits data to the database, it fills the identity map in the
+same fashion but unpacks it into a `books` row instead.
 
-1. Inheritance from a `declarative_base` object.
-2. A `__tablename__` class attribute.
-3. One or more `Column`s as class attributes.
-4. A `Column` specified to be the table's primary key.
+### `sessionmaker`
 
-Let's take a look at a class to define a `books` table. Inside of the
-`bookstore_app/` directory, create a file called `models.py`.
+To create a session, we need to use SQLAlchemy's `sessionmaker` class. This
+ensures that there is a consistent identity map for the duration of our session.
+
+Let's create a session in `debug.py` so that we can start executing
+statements in `bookstore.db`:
 
 ```py
-# bookstore_app/models.py
-from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+#!/usr/bin/env python3
 
-Base = declarative_base()
+from datetime import datetime
 
-class Book(Base):
-    __tablename__ = 'books'
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-    id = Column(Integer(), primary_key=True)
-    title = Column(String())
-    author = Column(String())
-    publisher = Column(String())
-    publish_date = Column(DateTime())
+from bookstore_app.models import Book
+
+if __name__ == '__main__':
+    
+    # Connect to the database
+    engine = create_engine('sqlite:///bookstore_app/bookstore.db')
+
+    # Create a session
+    session = sessionmaker(bind=engine)()
+
+    import ipdb; ipdb.set_trace()
 ```
 
-The `declarative_base` combines a container for table metadata as well as a
-group of methods that act as mappers between Python and our SQL database.
-Inheritance from `Base`, a `declarative_base` object, allows us to avoid
-rewriting code.
-
-The `__tablename__` attribute will eventually be used as the name of our SQL
-database table. The table's columns are identified using `Column` objects as
-attributes- the optional `primary_key` argument tells SQLAlchemy that
-`id` will be the primary key for the `books` table.
-
-This type of class is called a **data model**, or **model**.
+Run `python models.py` to create a session and enter `ipdb`.
 
 ***
 
-## Persisting the Schema
+## Creating Records
 
-We have all of the data we need to generate a database table, but it won't
-happen as soon as we save our module. We need to execute a series of Python
-statements to do **persist** our schema. You can do this from the Python shell,
-but we will be using **Alembic**, a migrations manager, to handle it.
+To create a new book record in our database, we need to create an object
+using the `Book` class. This syntax is the same as with instantiating any
+other Python class.
 
-First, navigate to the `bookstore_app/` directory and run
-`alembic init migrations`:
-
-```console
-$ alembic init migrations
-# =>   Creating directory /sqlalchemy-basics-08-2022/bookstore_app/migrations ...  done
-# =>   Creating directory /sqlalchemy-basics-08-2022/bookstore_app/migrations/versions ...  done
-# =>   Generating /sqlalchemy-basics-08-2022/bookstore_app/migrations/script.py.mako ...  done
-# =>   Generating /sqlalchemy-basics-08-2022/bookstore_app/migrations/env.py ...  done
-# =>   Generating /sqlalchemy-basics-08-2022/bookstore_app/migrations/README ...  done
-# =>   Generating /sqlalchemy-basics-08-2022/bookstore_app/alembic.ini ...  done
-# =>   Please edit configuration/connection/logging settings in '/sqlalchemy-basics-08-2022/bookstore_app/alembic.ini' before proceeding.
-```
-
-Let's also follow those instructions and update `bookstore_app/alembic.ini`
-before proceeding. This file handles the basic configurations for your
-database. The only thing we absolutely _need_ to change is `sqlalchemy.url` on
-line 58:
-
-```ini
-sqlalchemy.url = sqlite:///bookstore.db
-```
-
-Additionally, we need to point `bookstore_app/migrations/env.py` to our
-models' metadata:
-
-```py
-# bookstore_app/migrations/env.py
-# line 21
-from models import Base
-target_metadata = Base.metadata
-```
-
-Next, we can generate our first migration and persist the schema in a file
-called `bookstore.db`:
+> **Note**: while we can enter the data in order without argument names, we
+> are going to use them consistently in class constructors when using
+> SQLAlchemy. This is because it makes our code much more readable when working
+> with tables with many columns.
 
 ```console
-$ alembic revision --autogenerate -m 'Create table books'
-# => INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
-# => INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
-# => INFO  [alembic.autogenerate.compare] Detected added table 'books'
-# =>  Generating /sqlalchemy-basics-08-2022/bookstore_app/migrations/versions/39cd11f7545b_create_table_books.py ...  done
+ipdb> leonardo_da_vinci = Book(
+    title="Leonardo da Vinci",
+    author="Walter Isaacson",
+    publisher="Simon and Schuester",
+    publish_date=datetime(year=2017, month=10, day=17)
+)
+ipdb> session.add(leonardo_da_vinci)
+ipdb> session.commit()
 ```
 
-This generates a database for us in `bookstore_app/bookstore.db`, but it doesn't
-create our tables. To do that, we need to run `alembic upgrade head`. This will
-sync the database with all of our migrations up to the most recent.
+After we create our `Book` instance, we need to add it to the session and
+commit the transaction. If we want to save multiple books, we can do so with
+`session.bulk_save_objects(list)`:
 
 ```console
-$ alembic upgrade head
-# => INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
-# => INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
-# => INFO  [alembic.runtime.migration] Running upgrade  -> 39cd11f7545b, Create table books
+ipdb> a_game_of_thrones = Book(
+    title="A Game of Thrones",
+    author="George R. R. Martin",
+    publisher="Bantam Spectra",
+    publish_date=datetime(1996, 8, 1)
+)
+ipdb> harold_and_the_purple_crayon = Book(
+    title="Harold and the Purple Crayon",
+    author="Crockett Johnson",
+    publisher="Harper Collins",
+    publish_date=datetime(1955, 1, 1)
+)
+ipdb> session.bulk_save_objects([a_game_of_thrones, harold_and_the_purple_crayon])
+ipdb> session.commit()
 ```
-
-Now if you open up the database with the SQLite Explorer extension, you should
-see two tables:
-
-1. `alembic_version`: the ID of the currently synced migration.
-2. `books`: the table we defined in `models.py`!
 
 ***
+
+## Reading Records
+
+SQLAlchemy provides us many options for queries. You've probably noticed already
+if you've gone through the new SQLAlchemy module!
+
+SQLAlchemy uses queries that return `query` objects. Each of these objects
+possesses the same methods; this means that queries can be chained to great
+lengths. The only methods that do not allow chaining are those that return
+single records, like `first()`.
 
 ## Breakout Rooms
 
