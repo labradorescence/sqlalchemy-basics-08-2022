@@ -119,6 +119,101 @@ possesses the same methods; this means that queries can be chained to great
 lengths. The only methods that do not allow chaining are those that return
 single records, like `first()`.
 
+`query` objects, in addition to supporting chaining, are iterable objects. This
+means that you can loop through them or extract their data with a list
+interpretation.
+
+Let's add a `__repr__` to `Book` before moving on so we can inspect the returned
+objects a bit easier:
+
+```py
+# bookstore_app/models.py
+
+# imports, table metadata
+
+    def __repr__(self):
+        return f'Book({self.title} by {self.author})'
+```
+
+### Getting Everything
+
+Let's start by getting all of the data from a table:
+
+```console
+ipdb> books = session.query(Book)
+ipdb> print([book for book in books])
+
+# => [
+        Book(Leonardo da Vinci by Walter Isaacson),
+        Book(A Game of Thrones by George R. R. Martin),
+        Book(Harold and the Purple Crayon by Crockett Johnson)
+    ]
+```
+
+> Aren't you glad we added that `__repr__`?
+
+We would see the same output using the `all()` instance method:
+
+```console
+ipdb> students = session.query(Student).all()
+ipdb> print(students)
+
+# => [
+        Book(Leonardo da Vinci by Walter Isaacson),
+        Book(A Game of Thrones by George R. R. Martin),
+        Book(Harold and the Purple Crayon by Crockett Johnson)
+    ]
+```
+
+The former strategy is considered best practice, as it accesses the returned
+objects one at a time and is thus more memory-efficient.
+
+### Selecting Only Certain Columns
+
+By default, the `query()` method returns complete records from the data model
+passed in as an argument. If we're only looking for certain fields, we can
+specify this in the arguments we pass to `query()`. Here's how we would retrieve
+all of the students' names:
+
+```console
+ipdb> book_titles = [title for title in session.query(Book.title)]
+ipdb> print(book_titles)
+
+# => [('Leonardo da Vinci',), ('A Game of Thrones',), ('Harold and the Purple Crayon',)]
+```
+
+### Ordering
+
+By default, results from any database query are ordered by their primary key.
+The `order_by()` method allows us to sort by any column:
+
+```console
+ipdb> books_by_title = [title for title in session.query(Book.title).order_by(Book.title)]
+ipdb> print(books_by_title)
+
+# => [('A Game of Thrones',), ('Harold and the Purple Crayon',), ('Leonardo da Vinci',)]
+```
+
+### Limiting
+
+To limit your result set to the first `x` records, you can use the `limit()`
+method:
+
+```console
+ipdb> oldest_book = session.query(Book.title).order_by(Book.publish_date).limit(1)[0]
+ipdb> print(oldest_book)
+# => ('Harold and the Purple Crayon',)
+```
+
+The `first()` method is a quick and easy way to execute a `limit(1)` statement
+and does not require indexing or list interpretation:
+
+```console
+ipdb> oldest_book = session.query(Book.title).order_by(Book.publish_date).first()
+ipdb> print(oldest_book)
+# => ('Harold and the Purple Crayon',)
+```
+
 ## Breakout Rooms
 
 Let's take three minutes to go into breakout rooms, discuss, and debug. When
