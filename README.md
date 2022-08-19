@@ -20,6 +20,19 @@
 
 ***
 
+## Introduction
+
+This session is designed to be a **code-along**. There is a GitHub repo to clone
+down with branches to match different checkpoints along the way. If you run into
+errors before we move from one section to the next, please checkout the next
+checkpoint, but share those issues with me or another member of the curriculum
+team and we can address them after the session ends.
+
+Clone that repo down now and run `pipenv install && pipenv shell` to start up
+your virtual environment.
+
+***
+
 ## Seed Data
 
 What good is a database without any data? When working with any application
