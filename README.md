@@ -537,6 +537,20 @@ accordingly.
 
 ***
 
+## Generating a New Migration
+
+We have a new model set up in `models.py`: `Salesperson`. (This is a book
+_store_, after all.) Let's use Alembic to autogenerate a new migration:
+
+```console
+$ alembic revision --autogenerate -m 'Add table salespeople'
+```
+
+You should now see a new table for salespeople in `bookstore.db`. We also
+added a `cost` column for `books`. You can do a lot in one migration!
+
+***
+
 ## Seed Data
 
 What good is a database without any data? When working with any application
