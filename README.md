@@ -5,7 +5,7 @@
 - Create and persist a schema.
 - Create and save your first data model.
 - Manage changes to models with Alembic.
-- Join tables with one-to-many and many-to-many relationships.
+- Create records with seed data.
 
 ***
 
