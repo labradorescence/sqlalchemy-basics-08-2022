@@ -575,9 +575,7 @@ instructions we can use:
 
 There is much debate about the best location for seed data- if you have a good
 plan in place ahead of time, it's wise to make a `seed.py` script inside of your
-`migrations/` directory and import it into your first migration. It's a little
-late for that for us- we'll keep it in the `bookstore_app` directory instead,
-next to the database.
+app or `migrations/` directory and import it into your first migration.
 
 Let's set it up to import the various data models, engine-creators, and
 session-makers that it needs to write to our database.
