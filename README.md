@@ -139,10 +139,10 @@ _store_, after all.) Let's use Alembic to autogenerate a new migration:
 
 ```console
 $ alembic revision --autogenerate -m 'Add table salespeople'
-# => INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
-# => INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
-# => INFO  [alembic.runtime.migration] Running upgrade  -> a567je123s84, Add table salespeople
 ```
+
+You should now see a new table for salespeople in `bookstore.db`. We also
+added a `cost` column for `books`. You can do a lot in one migration!
 
 ***
 
