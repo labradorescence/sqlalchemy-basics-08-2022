@@ -14,5 +14,3 @@ class Book(Base):
     publisher = Column(String())
     publish_date = Column(DateTime())
 
-    def __repr__(self):
-        return f'Book({self.title} by {self.author})'
