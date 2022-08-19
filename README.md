@@ -2,8 +2,8 @@
 
 ## Learning Goals
 
-- Create and persist a schema.
 - Create and save your first data model.
+- Manage changes to models with Alembic.
 
 ***
 
