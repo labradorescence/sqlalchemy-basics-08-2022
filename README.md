@@ -132,6 +132,20 @@ accordingly.
 
 ***
 
+## Generating a New Migration
+
+We have a new model set up in `models.py`: `Salesperson`. (This is a book
+_store_, after all.) Let's use Alembic to autogenerate a new migration:
+
+```console
+$ alembic revision --autogenerate -m 'Add table salespeople'
+# => INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+# => INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+# => INFO  [alembic.runtime.migration] Running upgrade  -> a567je123s84, Add table salespeople
+```
+
+***
+
 ## Breakout Rooms
 
 Let's take a minute to go into breakout rooms, discuss, and debug. When
