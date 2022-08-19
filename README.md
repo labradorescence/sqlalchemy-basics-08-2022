@@ -68,6 +68,8 @@ def seed():
     session.query(Book).delete()
     session.query(Salesperson).delete()
 
+    session.close()
+
 if __name__ == '__main__':
     seed()
 ```
