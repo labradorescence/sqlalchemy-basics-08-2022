@@ -5,8 +5,17 @@ Revises: 0817994fdbf9
 Create Date: 2022-08-18 21:47:42.059339
 
 """
+
+from random import randint
+
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from faker import Faker
+
+from models import Book, Salesperson
 
 
 # revision identifiers, used by Alembic.
@@ -28,6 +37,31 @@ def upgrade() -> None:
     )
     op.add_column('books', sa.Column('cost', sa.Integer(), nullable=True))
     # ### end Alembic commands ###
+
+    engine = create_engine('sqlite:///bookstore.db')
+    session = sessionmaker(bind=engine)()
+
+    print("Seeding book costs...")
+
+    for book in session.query(Book):
+        book.cost = randint(5, 35)
+    
+    print("Seeding salespeople...")
+
+    fake = Faker()
+
+    salespeople = [
+        Salesperson(
+            name=fake.name(),
+            birthday=fake.date_time().date(),
+            last_clocked_in=fake.date_time(),
+            last_clocked_out=fake.date_time()
+        )
+    for i in range(20)]
+
+    session.bulk_save_objects(salespeople)
+    session.commit()
+    session.close()
 
 
 def downgrade() -> None:

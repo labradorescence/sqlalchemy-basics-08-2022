@@ -15,9 +15,9 @@ def seed():
     session.query(Book).delete()
     session.query(Salesperson).delete()
 
-    fake = Faker()
-
     print("Seeding books...")
+
+    fake = Faker()
 
     books = [
         Book(

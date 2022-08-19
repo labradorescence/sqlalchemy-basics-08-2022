@@ -5,8 +5,15 @@ Revises:
 Create Date: 2022-08-18 16:04:51.060065
 
 """
+
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from faker import Faker
+
+from models import Book
 
 
 # revision identifiers, used by Alembic.
@@ -27,6 +34,26 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
+
+    engine = create_engine('sqlite:///bookstore.db')
+    session = sessionmaker(bind=engine)()
+
+    print("Seeding books...")
+
+    fake = Faker()
+
+    books = [
+        Book(
+            title=fake.name(),
+            author=fake.name(),
+            publisher=fake.name(),
+            publish_date=fake.date_time().date(),
+        )
+    for i in range(50)]
+
+    session.bulk_save_objects(books)
+    session.commit()
+    session.close()
 
 
 def downgrade() -> None:
