@@ -134,8 +134,8 @@ accordingly.
 
 ## Breakout Rooms
 
-Let's take three minutes to go into breakout rooms, discuss, and debug. When
-we come back, we'll dive deeper into migrations with Alembic.
+Let's take a minute to go into breakout rooms, discuss, and debug. When
+we come back, we'll talk about using seed data with SQLAlchemy and Alembic.
 
 ***
 
