@@ -2,6 +2,7 @@
 
 from datetime import datetime
 
+from faker import Faker
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -14,5 +15,7 @@ if __name__ == '__main__':
 
     # Create a session
     session = sessionmaker(bind=engine)()
+
+    fake = Faker()
 
     import ipdb; ipdb.set_trace()

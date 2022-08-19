@@ -82,6 +82,43 @@ It's time to get our seed data set up.
 
 ## Faker
 
+Writing every single record into our database would take forever. It would be
+worth it if it were real data, but as real as it looks, it's still just data
+that came from asking my wife _"What are some books?"_
+
+Since all fake data is created equal, we are going to use a module called
+`Faker`. Faker is used by developers in many languages (including Ruby!) to
+generate large amounts of realistic fake data very quickly.
+
+`Faker` is already included in the `Pipfile` for
+this application, so we can try it out. Run `python debug.py`, and try
+out some Faker methods:
+
+```py
+fake.name()
+# => 'Samantha Taylor'
+fake.name()
+# => 'Connie Ferguson'
+fake.name()
+# => 'Christopher Ortega'
+```
+
+As you can see, every time we call the `name()` method, we get a new random name.
+Faker has a lot of [built-in randomized data generators][faker] that you can use:
+
+```py
+fake.email()
+# =>'hubbardpatricia@example.com'
+fake.color()
+# => '#7148af'
+fake.profile()
+# => {'job': 'Garment/textile technologist', 'company': 'Jones PLC', 'ssn': '768-52-6547', 'residence': '7571 Michael Coves\nNorth Daniel, VA 39350', 'current_location': (Decimal('-30.883927'), Decimal('65.589098')), 'blood_group': 'O-', 'website': ['http://www.grimes.org/', 'http://sanders.net/', 'https://manning-cowan.info/', 'https://www.sims-smith.info/'], 'username': 'julia98', 'name': 'Jillian Morris', 'sex': 'F', 'address': 'USNS Brown\nFPO AA 04021', 'mail': 'james05@yahoo.com', 'birthdate': datetime.date(1990, 6, 20)}
+```
+
+Let's use Faker to generate 50 random books (we will use the random library to
+generate prices). Replace the data after our data deletion in the `seed.py`
+file with the following code:
+
 ***
 
 ## Resources
