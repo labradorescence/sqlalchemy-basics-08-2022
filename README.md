@@ -214,10 +214,95 @@ ipdb> print(oldest_book)
 # => ('Harold and the Purple Crayon',)
 ```
 
+### Filtering
+
+Retrieving specific records requires use of the `filter()` method. A typical
+`filter()` statement has a column, a standard operator, and a value. It is
+possible to chain multiple `filter()` statements together, though it is
+typically easier to read with comma-separated clauses inside of one `filter()`
+statement.
+
+```console
+ipdb> last_30_years = [book for book in session.query(Book).filter(Book.publish_date >= datetime(1992, 8, 19))]
+ipdb> print(last_30_years)
+# => [Book(Leonardo da Vinci by Walter Isaacson), Book(A Game of Thrones by George R. R. Martin)]
+```
+
+<p align="center">
+<img src="https://media2.giphy.com/media/26FxsQwgJyU4me9ig/giphy.gif?cid=ecf05e47fpygu4wqi59tizlq2wgpxhp4ay3t0jbhdn7hdan6&rid=giphy.gif&ct=g"
+     alt="tituss burgess phew" />
+</p>
+
+***
+
+## Updating Records
+
+There are two main strategies for updating records with SQLAlchemy:
+
+1. Modify an object, then add it to the session and commit.
+2. Use the `update()` method to modify all records in a queryset.
+
+The former strategy works exactly how it sounds. Let's modify the record for
+"Harold and the Purple Crayon," as "Crockett Johnson" was just a pen name for
+the cartoonist David Johnson Leisk.
+
+```console
+ipdb> harold = session.query(Book).filter(Book.title == "Harold and the Purple Crayon").first()
+ipdb> harold.author = "David Johnson Leisk"
+ipdb> session.add(harold)
+ipdb> session.commit()
+```
+
+Now when we search for the same book, we see:
+
+```console
+ipdb> session.query(Book).filter(Book.title == "Harold and the Purple Crayon").first().author
+# => 'David Johnson Leisk'
+```
+
+The `update()` syntax is a bit odd for Python: it takes a dictionary with a
+column object as a key and an action as a value. Let's respect the author's
+wishes and change his record back to reflect his pen name:
+
+```console
+ipdb> session.query(Book).filter(Book.title == "Harold and the Purple Crayon").update({Book.author: "Crockett Johnson"})
+# => 1
+ipdb> session.query(Book).filter(Book.title == "Harold and the Purple Crayon").first().author
+# => 'Crockett Johnson'
+
+```
+
+***
+
+## Deleting Records
+
+Deletion is handled similarly to updating (though the syntax is a bit easier).
+There are two main strategies:
+
+1. Delete a record using an instance and the session object.
+2. Delete all records matching a queryset using the `query.delete()` method.
+
+I won't be executing any deletions here (we only have three records!) but here
+are the two options, respectively:
+
+```console
+# deleting harold and the purple crayon
+ipdb> harold = session.query(Book).filter(Book.title == "Harold and the Purple Crayon").first()
+ipdb> session.delete(harold)
+ipdb> session.commit()
+```
+
+```console
+# deleting everything in the books table
+ipdb> session.query(Book).delete()
+```
+
+***
+
 ## Breakout Rooms
 
 Let's take three minutes to go into breakout rooms, discuss, and debug. When
-we come back, we'll explore CRUD methods in SQLAlchemy.
+we come back, we'll dive deeper into migrations with Alembic.
 
 ***
 
